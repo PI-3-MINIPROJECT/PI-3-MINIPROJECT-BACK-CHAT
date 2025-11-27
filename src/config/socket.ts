@@ -17,7 +17,6 @@ const meetingRooms = new Map<string, OnlineUser[]>();
 
 // Configuration constants
 const MAX_PARTICIPANTS = parseInt(process.env.MAX_PARTICIPANTS || '10', 10);
-const MIN_PARTICIPANTS = parseInt(process.env.MIN_PARTICIPANTS || '2', 10);
 
 /**
  * Initialize Socket.IO server
