@@ -47,7 +47,7 @@ export const getMeetingInfo = async (
  * @param {NextFunction} next - Express next function
  */
 export const getServerStats = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
