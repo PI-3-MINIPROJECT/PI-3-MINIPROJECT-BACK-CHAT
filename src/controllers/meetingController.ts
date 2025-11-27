@@ -25,10 +25,34 @@ export const createMeeting = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { userId, title, description } = req.body;
+    const { 
+      userId, 
+      title, 
+      description, 
+      date, 
+      time, 
+      estimatedDuration, 
+      maxParticipants 
+    } = req.body;
 
     if (!userId) {
       throw createError('User ID is required', 400);
+    }
+
+    if (!title || !date || !time) {
+      throw createError('Title, date, and time are required', 400);
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) {
+      throw createError('Date must be in YYYY-MM-DD format', 400);
+    }
+
+    // Validate time format (HH:mm)
+    const timeRegex = /^\d{2}:\d{2}$/;
+    if (!timeRegex.test(time)) {
+      throw createError('Time must be in HH:mm format', 400);
     }
 
     const meetingId = generateMeetingId();
@@ -36,8 +60,12 @@ export const createMeeting = async (
     const meetingData = {
       meetingId,
       hostId: userId,
-      title: title || `Meeting ${meetingId}`,
+      title,
       description: description || '',
+      date,
+      time,
+      estimatedDuration: estimatedDuration || 60, // Default 60 minutes
+      maxParticipants: maxParticipants || parseInt(process.env.MAX_PARTICIPANTS || '10', 10),
       participants: [userId],
       activeParticipants: 0,
       createdAt: new Date().toISOString(),
@@ -280,10 +308,35 @@ export const updateMeeting = async (
 ): Promise<void> => {
   try {
     const { meetingId } = req.params;
-    const { userId, title, description, status } = req.body;
+    const { 
+      userId, 
+      title, 
+      description, 
+      date, 
+      time, 
+      estimatedDuration, 
+      maxParticipants, 
+      status 
+    } = req.body;
 
     if (!meetingId || !userId) {
       throw createError('Meeting ID and User ID are required', 400);
+    }
+
+    // Validate date format if provided
+    if (date) {
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        throw createError('Date must be in YYYY-MM-DD format', 400);
+      }
+    }
+
+    // Validate time format if provided
+    if (time) {
+      const timeRegex = /^\d{2}:\d{2}$/;
+      if (!timeRegex.test(time)) {
+        throw createError('Time must be in HH:mm format', 400);
+      }
     }
 
     const meeting = await chatService.getMeetingInfo(meetingId);
@@ -303,6 +356,10 @@ export const updateMeeting = async (
 
     if (title) updateData.title = title;
     if (description) updateData.description = description;
+    if (date) updateData.date = date;
+    if (time) updateData.time = time;
+    if (estimatedDuration) updateData.estimatedDuration = estimatedDuration;
+    if (maxParticipants) updateData.maxParticipants = maxParticipants;
     if (status) updateData.status = status;
 
     await chatService.updateMeeting(meetingId, updateData);
