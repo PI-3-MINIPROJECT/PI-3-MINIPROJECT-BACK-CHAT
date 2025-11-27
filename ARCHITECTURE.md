@@ -59,7 +59,7 @@
    Body: { title, description }
    
 2. User Backend (API Gateway)
-   ├─ authMiddleware: Validates cookie ✅
+   ├─ Validates session cookie ✅
    ├─ Extracts: userId = req.user.uid
    │
    └─► HTTP Request to Chat Backend
@@ -67,6 +67,7 @@
        Body: { userId, title, description }
        
 3. Chat Backend (This Server)
+   ├─ No authentication needed (User Backend already validated)
    ├─ Generates meetingId
    ├─ Saves to Firestore
    └─► Returns meeting data
