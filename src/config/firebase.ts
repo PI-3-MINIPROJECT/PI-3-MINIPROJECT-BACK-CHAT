@@ -11,7 +11,7 @@ let firebaseApp: admin.app.App | null = null;
 export const initializeFirebase = (): admin.app.App => {
   if (firebaseApp) return firebaseApp;
 
-  if (admin.apps.length > 0) {
+  if (admin.apps.length > 0 && admin.apps[0]) {
     firebaseApp = admin.apps[0];
     return firebaseApp;
   }
