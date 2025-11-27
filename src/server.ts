@@ -1,19 +1,19 @@
+// IMPORTANT: Load environment variables FIRST before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Application } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import { initializeFirebase } from './config/firebase';
 import { initializeSocketIO } from './config/socket';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 import chatRoutes from './routes/chatRoutes';
 import meetingRoutes from './routes/meetingRoutes';
 import { logger } from './utils/logger';
-
-// Load environment variables
-dotenv.config();
 
 /**
  * Main server application class

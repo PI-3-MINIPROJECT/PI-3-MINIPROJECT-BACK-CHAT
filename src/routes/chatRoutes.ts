@@ -3,17 +3,16 @@ import {
   getMeetingInfo,
   getServerStats,
 } from '../controllers/chatController';
-import { optionalAuth } from '../middlewares/authMiddleware';
 
 const router = Router();
 
 /**
  * @route   GET /api/chat/meeting/:meetingId
  * @desc    Get meeting information
- * @access  Public (optional auth)
+ * @access  Public (no auth needed - User Backend already validated)
  * @param   {string} meetingId - Meeting ID
  */
-router.get('/meeting/:meetingId', optionalAuth, getMeetingInfo);
+router.get('/meeting/:meetingId', getMeetingInfo);
 
 /**
  * @route   GET /api/chat/stats
