@@ -2,7 +2,7 @@
 
 ## Configuración Inicial
 
-**Base URL:** `http://localhost:4000`
+**Base URL:** `http://localhost:4001`
 **Content-Type:** `application/json` (para requests POST/PUT)
 
 ## 📍 Endpoints Disponibles
@@ -164,6 +164,58 @@ GET /api/meetings/user/user123
 }
 ```
 
+#### GET - Today's Meetings
+```
+GET /api/meetings/today/:userId
+```
+**Parámetros:**
+- `userId` (string): ID del usuario
+
+**Descripción:** Obtiene todas las reuniones del usuario programadas para el día de hoy
+
+**Ejemplo:**
+```
+GET /api/meetings/today/user123
+```
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "data": {
+    "date": "2024-11-27",
+    "count": 2,
+    "meetings": [
+      {
+        "meetingId": "meeting1",
+        "hostId": "user123",
+        "title": "Reunión Matutina",
+        "description": "Standup diario",
+        "date": "2024-11-27",
+        "time": "09:00",
+        "estimatedDuration": 30,
+        "maxParticipants": 5,
+        "participants": ["user123", "user456"],
+        "activeParticipants": 0,
+        "status": "active",
+        "createdAt": "2024-11-27T...",
+        "updatedAt": "2024-11-27T..."
+      },
+      {
+        "meetingId": "meeting2", 
+        "hostId": "user456",
+        "title": "Review de Proyecto",
+        "date": "2024-11-27",
+        "time": "14:30",
+        "estimatedDuration": 60,
+        "participants": ["user123", "user456", "user789"],
+        "status": "active"
+      }
+    ]
+  }
+}
+```
+
 #### GET - Meeting by ID
 ```
 GET /api/meetings/:meetingId
@@ -273,7 +325,7 @@ Crear una colección con estas variables:
 
 | Variable | Valor |
 |----------|-------|
-| `baseUrl` | `http://localhost:4000` |
+| `baseUrl` | `http://localhost:4001` |
 | `testUserId` | `user123` |
 | `testMeetingId` | `abc123def456` |
 
@@ -298,9 +350,10 @@ Accept: application/json
 3. **Get Meeting** - Obtener información de la reunión
 4. **Join Meeting** - Unir otro usuario
 5. **Get Stats** - Ver estadísticas del servidor
-6. **Update Meeting** - Actualizar la reunión
-7. **Leave Meeting** - Salir de la reunión
-8. **Delete Meeting** - Eliminar la reunión
+6. **Today's Meetings** - Ver reuniones de hoy
+7. **Update Meeting** - Actualizar la reunión
+8. **Leave Meeting** - Salir de la reunión
+9. **Delete Meeting** - Eliminar la reunión
 
 ### Test Data Samples:
 ```json

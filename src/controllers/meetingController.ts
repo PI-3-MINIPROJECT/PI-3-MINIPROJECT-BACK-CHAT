@@ -383,3 +383,53 @@ export const updateMeeting = async (
   }
 };
 
+/**
+ * Get today's meetings for a user
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ */
+export const getTodayMeetings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      throw createError('User ID is required', 400);
+    }
+
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
+    
+    logger.info(`Fetching today meetings for user: ${userId}, date: ${today}`);
+
+    const meetings = await chatService.getTodayMeetings(userId, today);
+
+    logger.success(`Found ${meetings.length} meetings for user ${userId} on ${today}`);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        date: today,
+        count: meetings.length,
+        meetings: meetings,
+      },
+    });
+  } catch (error: any) {
+    logger.error('Error in getTodayMeetings controller:', {
+      userId: req.params.userId,
+      error: error.message,
+      stack: error.stack
+    });
+    
+    if (error.statusCode) {
+      next(error);
+    } else {
+      next(createError(`Error fetching today meetings: ${error.message}`, 500));
+    }
+  }
+};
+
