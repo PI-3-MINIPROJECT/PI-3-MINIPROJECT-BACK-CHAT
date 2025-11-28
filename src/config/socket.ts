@@ -72,10 +72,14 @@ export const initializeSocketIO = (httpServer: HTTPServer): Server => {
         // Get current participants in the meeting (real-time, in memory)
         const currentParticipants = meetingRooms.get(meetingId) || [];
 
+        // Get meeting info to check maxParticipants
+        const meetingInfo = await chatService.getMeetingInfo(meetingId);
+        const meetingMaxParticipants = meetingInfo?.maxParticipants || MAX_PARTICIPANTS;
+
         // Check if meeting is full
-        if (currentParticipants.length >= MAX_PARTICIPANTS) {
+        if (currentParticipants.length >= meetingMaxParticipants) {
           socket.emit(SocketEvents.ERROR, {
-            message: `Meeting is full (maximum ${MAX_PARTICIPANTS} participants)`,
+            message: `Meeting is full (maximum ${meetingMaxParticipants} participants)`,
           });
           return;
         }

@@ -88,6 +88,55 @@ export interface ErrorResponse {
 }
 
 /**
+ * Meeting data interface
+ * @interface Meeting
+ */
+export interface Meeting {
+  meetingId: string;
+  hostId: string;
+  title: string;
+  description: string;
+  date: string; // Format: YYYY-MM-DD
+  time: string; // Format: HH:mm
+  estimatedDuration: number; // Duration in minutes
+  maxParticipants: number;
+  participants: string[]; // Array of user IDs who have joined
+  activeParticipants: number; // Currently online participants
+  createdAt: string;
+  updatedAt: string;
+  status: 'active' | 'completed' | 'cancelled';
+}
+
+/**
+ * Create meeting request interface
+ * @interface CreateMeetingRequest
+ */
+export interface CreateMeetingRequest {
+  userId: string;
+  title: string;
+  description?: string;
+  date: string;
+  time: string;
+  estimatedDuration?: number;
+  maxParticipants?: number;
+}
+
+/**
+ * Update meeting request interface
+ * @interface UpdateMeetingRequest
+ */
+export interface UpdateMeetingRequest {
+  userId: string;
+  title?: string;
+  description?: string;
+  date?: string;
+  time?: string;
+  estimatedDuration?: number;
+  maxParticipants?: number;
+  status?: 'active' | 'completed' | 'cancelled';
+}
+
+/**
  * Success response interface
  * @interface SuccessResponse
  */

@@ -34,17 +34,26 @@ export class ChatService {
    */
   async getUserMeetings(userId: string): Promise<any[]> {
     try {
+      // First get all meetings that include the user
       const snapshot = await this.db
         .collection('meetings')
         .where('participants', 'array-contains', userId)
-        .orderBy('createdAt', 'desc')
         .get();
 
-      const meetings = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      // Sort locally by createdAt descending to avoid Firestore composite index issues
+      const meetings = snapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .sort((a: any, b: any) => {
+          // Sort by createdAt desc (newest first)
+          const aDate = new Date(a.createdAt || 0);
+          const bDate = new Date(b.createdAt || 0);
+          return bDate.getTime() - aDate.getTime();
+        });
 
+      logger.info(`Found ${meetings.length} meetings for user ${userId}`);
       return meetings;
     } catch (error) {
       logger.error(`Error fetching meetings for user ${userId}`, error);
@@ -176,6 +185,43 @@ export class ChatService {
       logger.info(`Meeting deleted: ${meetingId}`);
     } catch (error) {
       logger.error(`Error deleting meeting ${meetingId}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get today's meetings for a user
+   * @param {string} userId - User ID
+   * @param {string} date - Date in YYYY-MM-DD format
+   * @returns {Promise<any[]>} Array of today's meetings
+   */
+  async getTodayMeetings(userId: string, date: string): Promise<any[]> {
+    try {
+      // First get all meetings for the user
+      const snapshot = await this.db
+        .collection('meetings')
+        .where('participants', 'array-contains', userId)
+        .get();
+
+      // Filter by date locally to avoid Firestore composite index issues
+      const meetings = snapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter((meeting: any) => meeting.date === date)
+        .sort((a: any, b: any) => {
+          // Sort by time
+          if (a.time && b.time) {
+            return a.time.localeCompare(b.time);
+          }
+          return 0;
+        });
+
+      logger.info(`Found ${meetings.length} meetings for user ${userId} on ${date}`);
+      return meetings;
+    } catch (error) {
+      logger.error(`Error fetching today meetings for user ${userId} on ${date}`, error);
       throw error;
     }
   }

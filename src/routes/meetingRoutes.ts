@@ -7,6 +7,7 @@ import {
   leaveMeeting,
   deleteMeeting,
   updateMeeting,
+  getTodayMeetings,
 } from '../controllers/meetingController';
 
 const router = Router();
@@ -26,6 +27,14 @@ router.post('/', createMeeting);
  * @param   {string} userId - User ID
  */
 router.get('/user/:userId', getUserMeetings);
+
+/**
+ * @route   GET /api/meetings/today/:userId
+ * @desc    Get today's meetings for a user
+ * @access  Internal (called from User Backend)
+ * @param   {string} userId - User ID
+ */
+router.get('/today/:userId', getTodayMeetings);
 
 /**
  * @route   GET /api/meetings/:meetingId
