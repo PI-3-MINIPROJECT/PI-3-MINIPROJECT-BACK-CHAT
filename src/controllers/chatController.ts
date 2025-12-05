@@ -3,6 +3,10 @@ import { ChatService } from '../services/chatService';
 import { createError } from '../middlewares/errorHandler';
 import { getActiveMeetingsCount, getTotalUsersCount } from '../config/socket';
 
+/**
+ * ChatService instance for meeting operations
+ * @type {ChatService}
+ */
 const chatService = new ChatService();
 
 /**

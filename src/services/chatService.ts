@@ -6,8 +6,14 @@ import { logger } from '../utils/logger';
  * @class ChatService
  */
 export class ChatService {
+  /** Firestore database instance */
   private db: FirebaseFirestore.Firestore;
 
+  /**
+   * Create a new ChatService instance
+   * Initializes Firestore connection
+   * @constructor
+   */
   constructor() {
     this.db = getFirestoreInstance();
   }

@@ -10,6 +10,10 @@ import {
   getTodayMeetings,
 } from '../controllers/meetingController';
 
+/**
+ * Express router for meeting-related endpoints
+ * @type {Router}
+ */
 const router = Router();
 
 /**

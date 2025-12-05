@@ -2,12 +2,21 @@ import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
 
 /**
- * Custom error class
+ * Custom error class for application errors
+ * Extends Error and adds HTTP status code
  * @class AppError
+ * @extends {Error}
  */
 export class AppError extends Error {
+  /** HTTP status code for the error */
   statusCode: number;
 
+  /**
+   * Create a new AppError instance
+   * @param {string} message - Error message
+   * @param {number} statusCode - HTTP status code (400, 404, 500, etc.)
+   * @constructor
+   */
   constructor(message: string, statusCode: number) {
     super(message);
     this.statusCode = statusCode;

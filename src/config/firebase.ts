@@ -1,6 +1,11 @@
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 
+/**
+ * Firebase Admin app instance (singleton)
+ * Initialized once and reused across the application
+ * @type {admin.app.App | null}
+ */
 let firebaseApp: admin.app.App | null = null;
 
 /**

@@ -3,11 +3,16 @@ import { ChatService } from '../services/chatService';
 import { createError } from '../middlewares/errorHandler';
 import { logger } from '../utils/logger';
 
+/**
+ * ChatService instance for meeting operations
+ * @type {ChatService}
+ */
 const chatService = new ChatService();
 
 /**
  * Generate a unique meeting ID
- * @returns {string} Unique meeting ID
+ * Creates a random alphanumeric string using Math.random()
+ * @returns {string} Unique meeting ID (alphanumeric string)
  */
 const generateMeetingId = (): string => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

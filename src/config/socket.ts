@@ -10,12 +10,24 @@ import {
 import { ChatService } from '../services/chatService';
 import { logger } from '../utils/logger';
 
+/**
+ * ChatService instance for meeting operations
+ * @type {ChatService}
+ */
 const chatService = new ChatService();
 
-// Store online users by meeting (in memory - real-time only)
+/**
+ * Store online users by meeting (in memory - real-time only)
+ * Key: meetingId, Value: Array of OnlineUser objects
+ * @type {Map<string, OnlineUser[]>}
+ */
 const meetingRooms = new Map<string, OnlineUser[]>();
 
-// Configuration constants
+/**
+ * Maximum number of participants allowed per meeting
+ * Read from environment variable MAX_PARTICIPANTS, default: 10
+ * @type {number}
+ */
 const MAX_PARTICIPANTS = parseInt(process.env.MAX_PARTICIPANTS || '10', 10);
 
 /**
@@ -41,13 +53,21 @@ export const initializeSocketIO = (httpServer: HTTPServer): Server => {
 
   /**
    * Handle socket connection
+   * Sets up event listeners for each connected socket
    * @param {Socket} socket - Socket instance
+   * @listens SocketEvents#CONNECTION
    */
   io.on(SocketEvents.CONNECTION, (socket: Socket) => {
     logger.info(`New connection: ${socket.id}`);
 
     /**
      * Handle user joining a meeting
+     * Validates meeting exists, checks capacity, adds user to room
+     * @param {JoinMeetingPayload} payload - Join meeting payload
+     * @emits SocketEvents#ERROR - If validation fails or meeting is full
+     * @emits SocketEvents#USERS_ONLINE - To all users in the meeting
+     * @emits SocketEvents#USER_JOINED - To other users in the meeting
+     * @listens SocketEvents#JOIN_MEETING
      */
     socket.on(SocketEvents.JOIN_MEETING, async (payload: JoinMeetingPayload) => {
       try {
@@ -144,6 +164,11 @@ export const initializeSocketIO = (httpServer: HTTPServer): Server => {
 
     /**
      * Handle chat message (real-time only, not saved to database)
+     * Broadcasts message to all users in the meeting
+     * @param {Partial<ChatMessage>} payload - Chat message payload
+     * @emits SocketEvents#ERROR - If validation fails
+     * @emits SocketEvents#CHAT_MESSAGE - To all users in the meeting
+     * @listens SocketEvents#CHAT_MESSAGE
      */
     socket.on(SocketEvents.CHAT_MESSAGE, async (payload: Partial<ChatMessage>) => {
       try {
@@ -189,6 +214,10 @@ export const initializeSocketIO = (httpServer: HTTPServer): Server => {
 
     /**
      * Handle typing indicator start
+     * Broadcasts typing indicator to other users in the meeting
+     * @param {TypingPayload} payload - Typing indicator payload
+     * @emits SocketEvents#TYPING_START - To other users in the meeting (not sender)
+     * @listens SocketEvents#TYPING_START
      */
     socket.on(SocketEvents.TYPING_START, (payload: TypingPayload) => {
       const { meetingId, userId, username } = payload;
@@ -206,6 +235,10 @@ export const initializeSocketIO = (httpServer: HTTPServer): Server => {
 
     /**
      * Handle typing indicator stop
+     * Broadcasts typing stop indicator to other users in the meeting
+     * @param {TypingPayload} payload - Typing indicator payload
+     * @emits SocketEvents#TYPING_STOP - To other users in the meeting (not sender)
+     * @listens SocketEvents#TYPING_STOP
      */
     socket.on(SocketEvents.TYPING_STOP, (payload: TypingPayload) => {
       const { meetingId, userId, username } = payload;
@@ -223,6 +256,9 @@ export const initializeSocketIO = (httpServer: HTTPServer): Server => {
 
     /**
      * Handle user leaving a meeting
+     * Removes user from room and notifies others
+     * @param {string} meetingId - Meeting ID to leave
+     * @listens SocketEvents#LEAVE_MEETING
      */
     socket.on(SocketEvents.LEAVE_MEETING, async (meetingId: string) => {
       await handleUserLeave(socket, meetingId, io);
@@ -230,6 +266,8 @@ export const initializeSocketIO = (httpServer: HTTPServer): Server => {
 
     /**
      * Handle socket disconnection
+     * Automatically removes user from all meetings and notifies others
+     * @listens SocketEvents#DISCONNECT
      */
     socket.on(SocketEvents.DISCONNECT, async () => {
       logger.info(`Disconnected: ${socket.id}`);

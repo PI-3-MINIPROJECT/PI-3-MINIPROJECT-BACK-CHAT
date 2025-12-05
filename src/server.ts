@@ -20,11 +20,20 @@ import { logger } from './utils/logger';
  * @class App
  */
 class App {
+  /** Express application instance */
   public app: Application;
+  /** HTTP server instance */
   public server: any;
+  /** Socket.IO server instance */
   public io: Server | null = null;
+  /** Server port number */
   private readonly PORT: number;
 
+  /**
+   * Create a new App instance
+   * Initializes Express, middlewares, routes, Firebase, and Socket.IO
+   * @constructor
+   */
   constructor() {
     this.app = express();
     this.server = createServer(this.app);
@@ -184,20 +193,36 @@ class App {
   }
 }
 
-// Error handling for unhandled promises and exceptions
+/**
+ * Handle unhandled promise rejections
+ * Logs the error but doesn't crash the application
+ * @event process#unhandledRejection
+ */
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection', { promise, reason });
 });
 
+/**
+ * Handle uncaught exceptions
+ * Logs the error and exits the application
+ * @event process#uncaughtException
+ */
 process.on('uncaughtException', (error) => {
   logger.error('Uncaught Exception:', error);
   process.exit(1);
 });
 
-// Create and start the application
+/**
+ * Application instance
+ * Created and started when this module is loaded
+ * @type {App}
+ */
 const app = new App();
 app.listen();
 
-// Export for testing purposes
+/**
+ * Export application instance for testing purposes
+ * @default
+ */
 export default app;
 

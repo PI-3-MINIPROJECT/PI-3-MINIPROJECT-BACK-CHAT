@@ -4,6 +4,10 @@ import {
   getServerStats,
 } from '../controllers/chatController';
 
+/**
+ * Express router for chat-related endpoints
+ * @type {Router}
+ */
 const router = Router();
 
 /**
